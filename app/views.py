@@ -26,8 +26,28 @@ def index():
 @app.route('/choice')
 def choice():
 	choice, hall = algorithm.makeChoice(current_user.getLocation(), current_user.getFoods())
-	
 	return render_template('choice.html',choice=choice,hall=hall,user=current_user)
+
+@app.route('/choiceMexican')
+def choiceMexican():
+	choice, hall = algorithm.makeChoice(current_user.getLocation(), current_user.getFoods(), "mexican")	
+	return render_template('choiceMexican.html',choice=choice,hall=hall,user=current_user)
+
+@app.route('/choiceAsian')
+def choiceAsian():
+	choice, hall = algorithm.makeChoice(current_user.getLocation(), current_user.getFoods(), "asian")	
+	return render_template('choiceAsian.html',choice=choice,hall=hall,user=current_user)
+
+@app.route('/choiceAmerican')
+def choiceAmerican():
+	choice, hall = algorithm.makeChoice(current_user.getLocation(), current_user.getFoods(), "american")
+	return render_template('choiceAmerican.html',choice=choice,hall=hall,user=current_user)
+
+@app.route('/choiceItalian')
+def choiceItalian():
+	choice, hall = algorithm.makeChoice(current_user.getLocation(), current_user.getFoods(), "italian")
+	return render_template('choiceItalian.html',choice=choice,hall=hall,user=current_user)
+
 
 @app.route('/register', methods=['GET','POST'] )
 def register():
@@ -71,7 +91,7 @@ def getloc():
 	print request.form["lat"], request.form["lng"]
 	return request.form["lat"], request.form["lng"]
 
-@app.route('/logout', methods=["POST"])
+@app.route('/logout', methods=["POST", "GET"])
 def logout():
 	logout_user()
 	flash('Logged out successfully.', 'success')

@@ -1,15 +1,15 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-{% if True  %}
-<h4 style="text-align:center"> Choose a category to find the best food options near you </h4>
+
+
 {% if user.is_authenticated() %}
-<h4>Hi {{user.get_name()}}</h4>
-{% endif %}
-{% for category in ['Mexican Food', 'American Food', 'Asian Food','Italian Food'] %}
+<h4 style="text-align:center"> Choose a category to find the best food options near you </h4>
+
+{% for category in ['Mexican', 'American', 'Asian','Italian'] %}
 <div class="row">
   <div class="small-4 small-centered columns">
-  	<a href="{{ url_for('choice') }}" class="button" style="width:300px">{{category}}</a>
+  	<a href="{{ url_for('choice'+category) }}" class="button" style="width:300px">{{category}} Food</a>
   </div>
 </div>
 {% endfor %}
@@ -20,6 +20,7 @@
   </div>
 </div>
 
-</div>
+{% else %}
+<h4> Please log in to recieve food recommendation</h4>
 {% endif %}
 {% endblock %}

@@ -15,5 +15,5 @@ class RegisterForm(Form):
 
 
 class LoginForm(Form):
-	username = TextField('Userame', validators=[Required()])
+	username = TextField('Username', validators=[Required()])
 	password = PasswordField('Password', validators=[Required()])

@@ -27,8 +27,8 @@ def nomnomnom(Fc, d, weightingFactorF, g):
 	DisList = [["hmc", (.59526, -2.04373)], ["frary", (.595165, -2.0544)], ["cmc", (.595185, -2.05441)],["pitzer",(.595214,-2.05435)]]
 	for i in range(len(Fc)):
 		for j in range(len(DisList)):
-			if DisList[j][0] == str(Fc[j][2]):
-				Fc[j][2] = DisList[j][1]
+			if DisList[j][0] == str(Fc[i][2]):
+				Fc[i][2] = DisList[j][1]
 	DisCalcs = distanceCalcs(Fc, d, g, DisList)
 	Fc = DisCalcs[0]
 	distances = DisCalcs[1]
@@ -36,12 +36,13 @@ def nomnomnom(Fc, d, weightingFactorF, g):
 	#change code here to change number of results
 	results = numResults(Fc, d, weightingFactorF, scores, 1)
 	results = changer(results, distances)
-	dHall = None
-	print results
-	for hall in DisList:
-		if results[0][2] == hall[1]:
-			dHall = hall[0]
-	return results[0][0], dHall
+	if results == []:
+		return "No options for you. Try to be more exciting!", ""
+	if type(results[0][2]) == tuple:
+		for hall in DisList:
+			if hall[1] == results[0][2]:
+				results[0][2] = hall[0]
+	return results[0][0], results[0][2]
 
 def distanceCalcs(Fc, d, g, DisList):
 	""" deals with distance stuff
@@ -68,7 +69,7 @@ def distanceCalcs(Fc, d, g, DisList):
 
 	#remove any lists in the Fc that have a third element (dining Hall) that corresponds to 
 	#the current dining hall's coordinates only if that dining hall is too far away
-	
+	print "Distance:",coordDist
 	if coordDist > d:
 		filter(lambda x: x[2]!=diningHallCoord, Fc)
 
@@ -94,8 +95,6 @@ def scoreList(Fc, d, weightingFactorF):
 		#creates a score out of 10 for the distance of the nth element
 		if d == 0.0:
 			d = 1.0
-		print Fc[n][1]
-		print Fc
 		#Fc[n][1]=math.sqrt(int((Fc[n][1][1]))**2 + int((Fc[n][1][2]))**2)
 		distanceScore = (Fc[n][1]/d)*10
 		#weight the distanceScore according to the user's preference
@@ -141,17 +140,9 @@ def changer(results, distances):
 	return results
 
 
-def taggedcuisine(meal):
-	tags = meal[2]
-	#if preferredTag in tags:
-	return True
-	#else:
-	#	return False
 
 
 def tagFinder(keyName):
-	print keyName
-	print type(keyName)
 	food = dinner.find_one({"name": keyName})
 	if food:
 		tagList = food["tags"]
@@ -159,7 +150,7 @@ def tagFinder(keyName):
 	else:
 		return None
 
-def makeChoice(g, foodListDict):
+def makeChoice(g, foodListDict, preferredTag=""):
 	Fc = []
 	# list of lists with three elements, name, value, list of tags, dininghall name
 	favMeals = []
@@ -169,15 +160,14 @@ def makeChoice(g, foodListDict):
 		if tagList:
 			hallName = tagList[0]
 			favMeals.append([key, foodListDict[key], tagList, hallName])
-	preferredTag = ""
-	filter(taggedcuisine, favMeals)
+	if preferredTag != "":
+		favMeals = [meal for meal in favMeals if preferredTag in meal[2]]
 	if len(favMeals) == 0:
-		print "No options for you. Try to be more exciting!"
-	print favMeals
+		return "No options for you. Try to be more exciting!", ""
 	for f in range(len(favMeals)):
 		hallName = favMeals[f][3]
 		Fc.append([favMeals[f][0], favMeals[f][1], hallName])
-	d = 1000000
+	d = 50
 	return nomnomnom(Fc, d, 0.5, g)
 
 
