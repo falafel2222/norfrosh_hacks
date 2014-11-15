@@ -2,14 +2,14 @@ from flask import render_template, request, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import app, login_manager
 from forms import RegisterForm, LoginForm
-import firebase
 from flask.ext.login import current_user, login_user, logout_user
 from models import User
 
 @login_manager.user_loader
 def load_user(userid):
-	r = firebase.get('/users/'+ userid + '.json')
-	return User(userid, r['names'], r['languages'], r['email'], r['password']) 
+	#r = firebase.get('/users/'+ userid + '.json')
+	r = {} # update to get user from mongodb
+	pass #User(userid, r['names'], r['languages'], r['email'], r['password']) 
 
 
 @app.route('/')
@@ -28,7 +28,7 @@ def register():
 			'password': generate_password_hash(form.password.data)
 		}
 		teamname = form.teamname.data
-		firebase.put('/users/'+teamname+'.json',user_data)
+		#firebase.put('/users/'+teamname+'.json',user_data)
 
 		return redirect(url_for('index'))
 
@@ -37,7 +37,8 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
 	form = LoginForm()
-	user = firebase.get('/users/'+form.teamname.data + '.json')
+	#user = firebase.get('/users/'+form.teamname.data + '.json')
+	user = null
 	print user
 	print "trying to login"
 	if user: # and check_password_hash(user['password'], form.password.data):
