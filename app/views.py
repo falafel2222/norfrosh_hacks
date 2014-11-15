@@ -34,11 +34,11 @@ def register():
 
 	return render_template('register.html', form=form)
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
 	form = LoginForm()
 	#user = firebase.get('/users/'+form.teamname.data + '.json')
-	user = null
+	user = None
 	print user
 	print "trying to login"
 	if user: # and check_password_hash(user['password'], form.password.data):

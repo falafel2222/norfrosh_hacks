@@ -1,0 +1,14 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<h1>Welcome to Hub!</h1>
+{% if user.is_authenticated()  %}
+{% redirect(url_for('index')) %}
+{% else %}
+<form method="POST" action="{{ url_for('login')}}" role="form">
+	{{ form_field(login_form.teamname)}}
+	{{ form_field(login_form.password)}}
+	<button type = "submit">Login</button>
+</form>
+{% endif %}
+{% endblock %}

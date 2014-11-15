@@ -1,14 +1,23 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-<h1>Welcome to Hub!</h1>
-{% if user.is_authenticated()  %}
-<h1> Hi, {{ user.teamname }} </h1>
-{% else %}
-<form method="POST" action="{{ url_for('login') }}" role="form">
-	{{ form_field(login_form.teamname)}}
-	{{ form_field(login_form.password)}}
-	<button type = "submit">Login</button>
-</form>
+{% if True  %}
+<h4 style="text-align:center"> Choose a category to find the best food options near you </h4>
+<h4>.</h4>
+{% for category in ['Mexican Food', 'American Food', 'Asian Food','Italian Food'] %}
+<div class="row">
+  <div class="small-4 small-centered columns">
+  	<a href="{{ url_for('index') }}" class="button" style="width:300px">{{category}}</a>
+  </div>
+</div>
+{% endfor %}
+
+<div class="row">
+  <div class="small-4 small-centered columns">
+  	<a href="{{ url_for('index') }}" class="button" style="width:300px">I'm up for anything</a>
+  </div>
+</div>
+
+</div>
 {% endif %}
 {% endblock %}
