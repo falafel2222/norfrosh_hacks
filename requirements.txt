@@ -10,3 +10,5 @@ itsdangerous==0.24
 requests==2.4.3
 wsgiref==0.1.2
 pymongo==2.7.2
+lxml==3.4.0
+requests==1.5.6

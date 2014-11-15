@@ -5,9 +5,16 @@
 	{{ form_field(form.username) }}
 	{{ form_field(form.password) }}
 	{{ form_field(form.confirm) }}
-	{{ form_field(form.firstFoods) }}
-	{{ form_field(form.secondFoods) }}
-	{{ form_field(form.thirdFoods) }}
+	<div class="row">
+  		<div class="large-3 large-centered columns">
+  			<ul class="button-group even-3" style="width:600px;"> 
+  			<li>{{ form_field(form.firstFoods) }}</li>
+			<li>{{ form_field(form.secondFoods) }}</li>
+			<li>{{ form_field(form.thirdFoods) }}</li>
+			</ul>
+  		</div>
+	</div>
+	
 	<button class = "btn btn-primary" type= "submit">Register</button>
 </form>
 {% endblock %}

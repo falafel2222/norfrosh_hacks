@@ -8,55 +8,22 @@ class User(UserMixin):		# stores all of our user data
 		self.bestFoods = bestFoods
 
 	def get_id(self):
-		return unicode(self.teamname)	#flask login ids have to be unicode
+		return unicode(self.username)	#flask login ids have to be unicode
 
-	def set_name(userName):
-		self.name = userName
+	def getFoods(self):
+		return self.bestFoods
 
-	def get_name():
-		return self.name
+	def set_name(self,username):
+		self.username = username
 
-	def set_americanFav(L):
-		self.american = L
+	def get_name(self):
+		return self.username
 
-	def get_americanFav():
-		return self.american
+	def setLocation(self,loc):
+		self.location = location
 
-	def set_italianFav(L):
-		self.italian = L
-
-	def get_italianFav():
-		return self.italian
-
-	def set_asianFav(L):
-		self.asian = L
-
-	def get_asianFav():
-		return self.asian
-
-	def set_mexicanFav(L):
-		self.mexican = L
-
-	def get_mexicanFav():
-		return self.mexican
-
-	def set_mediterranean(L):
-		self.mediterranean = L
-
-	def get_mediterranean():
-		return self. mediterranean
-
-	def set_college(S):
-		self.college = S
-
-	def get_college():
-		return self.college
-
-	def set_location(loc):
-		self.loc = loc
-
-	def get_location():
-		return self.x
+	def getLocation(self):
+		return self.location
 
 	
 

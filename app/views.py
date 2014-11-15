@@ -1,10 +1,11 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import app, login_manager
 from forms import RegisterForm, LoginForm
 from flask.ext.login import current_user, login_user, logout_user, login_required
 from models import User
 from pymongo import MongoClient
+import algorithm
 
 client = MongoClient('mongodb://norfrosh:food@ds051110.mongolab.com:51110/users')
 db = client.users
@@ -12,21 +13,21 @@ user = db.user
 
 @login_manager.user_loader
 def load_user(userid):
-	u = user.find_one({"username": userid})
-	bestFoods = {}
-	for food in r['firstFoods']:
-		bestFoods[food]=10
-	for food in r['secondFoods']:
-		bestFoods[food] = 7
-	for food in r['thirdFoods']:
-		bestFoods[food] = 4
-	return User(userid, r['password'], bestFoods) 
+	print userid
+	u = user.find_one({"name":userid})
+	if u:
+		return User(userid, u['password'],u['foodList']) 
 
 
 @app.route('/')
 def index():
-	form = LoginForm()
-	return render_template('index.html', user=current_user, login_form = form)
+	return render_template('index.html', user=current_user)
+
+@app.route('/choice')
+def choice():
+	choice, hall = algorithm.makeChoice(current_user.getLocation(), current_user.getFoods())
+	
+	return render_template('choice.html',choice=choice,hall=hall,user=current_user)
 
 @app.route('/register', methods=['GET','POST'] )
 def register():
@@ -34,11 +35,11 @@ def register():
 	if request.method == 'POST':
 		bestFoods = {}
 		for food in form.firstFoods.data:
-			bestFoods[food]=10
+			bestFoods[food]=10.0
 		for food in form.secondFoods.data:
-			bestFoods[food] = 7
+			bestFoods[food] = 7.0
 		for food in form.thirdFoods.data:
-			bestFoods[food] = 4
+			bestFoods[food] = 4.0
 		user_data = {
 			'name': form.username.data,
 			'password': generate_password_hash(form.password.data),
@@ -48,17 +49,18 @@ def register():
 
 		return redirect(url_for('index'))
 
-	return render_template('register.html', form=form)
+	return render_template('register.html', form=form, user=current_user)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
 	form = LoginForm()
-	u = user.find_one({"username": form.username.data})
-	print u
-	print "trying to login"
-	if u: # and check_password_hash(user['password'], form.password.data):
+	if request.method == 'GET':
+		return render_template('login.html', login_form=form, user= current_user)
+	u = user.find_one({"name": form.username.data})
+	#print u
+	if u:
 		print 'should be logging in now'
-		uu = load_user(form.teamname.data)
+		uu = load_user(form.username.data)
 		login_user(uu)
 	return redirect(url_for('index'))
 
@@ -72,4 +74,6 @@ def getloc():
 @app.route('/logout', methods=["POST"])
 def logout():
 	logout_user()
+	flash('Logged out successfully.', 'success')
 	return redirect(url_for('index'))
+

@@ -1,39 +1,47 @@
 import math
 
+import pymongo
+
 from pymongo import MongoClient
 
 client1 = MongoClient('mongodb://norfrosh:food@ds051110.mongolab.com:51110/dining')
-dbc = client1.dining
-collection1 = dbc['dinner']
+db = client1.dining
+dinner = db['dinner']
 
-client2 = MongoClient('mongodb://norfrosh:food@ds051110.mongolab.com:51110/dining')
-dbu = client2.users
-collection2 = dbu['user']
+client2 = MongoClient('mongodb://norfrosh:food@ds051110.mongolab.com:51110/users')
+db = client2.users
+user = db.user
 
 
-
-# Hackathon Algorithm-Dining Hall Picker
-
-#dictionary of dining halls and their coordinates (each a tuple)
 
 def nomnomnom(Fc, d, weightingFactorF, g):
 	"""returns the best option for food and dining hall
 		inputs: Fc, a list (for a specific cuisine) of lists where each list 
-				contains three elements, the food(a string), its user-value(10.0-1.0, 10.0 is best), and its corresponding dining hall coordinates (a tuple);
+				contains three elements, the food(a string), its user-value(10.0-1.0, 10.0 is best), 
+				and its corresponding dining hall name (a string), which will be converted to coordinates;
 				d, a float describing the distance one is willing to go;
 				weightingFactorF, a float corresponding to the weight FOOD has;
 				g, a tuple representing the geographical coordinates of the user
 		outputs: Nom, a list with elements food, dining hall, and distance
 	"""
-	DisList = [["Mudd-Hoch", (.59526, -2.04373)], ["Pomona-Frank", (.59509, -2.05445)], ["Pomona-Frary", (.595165, -2.0544)], ["Pomona-Oldenborg", (.595107, -2.05446)], ["CMC-Collins", (.595185, -2.05441)], ["Scripps-Malott", (.595207, -2.05444)], ["Pitzer-McConnell", (.595214, -2.05435)]]
+	DisList = [["hmc", (.59526, -2.04373)], ["frary", (.595165, -2.0544)], ["cmc", (.595185, -2.05441)],["pitzer",(.595214,-2.05435)]]
+	for i in range(len(Fc)):
+		for j in range(len(DisList)):
+			if DisList[j][0] == str(Fc[j][2]):
+				Fc[j][2] = DisList[j][1]
 	DisCalcs = distanceCalcs(Fc, d, g, DisList)
 	Fc = DisCalcs[0]
 	distances = DisCalcs[1]
 	scores = scoreList(Fc, d, weightingFactorF)
 	#change code here to change number of results
-	results = numResults(Fc, d, weightingFactorF, scores, 3)
+	results = numResults(Fc, d, weightingFactorF, scores, 1)
 	results = changer(results, distances)
-	return results
+	dHall = None
+	print results
+	for hall in DisList:
+		if results[0][2] == hall[1]:
+			dHall = hall[0]
+	return results[0][0], dHall
 
 def distanceCalcs(Fc, d, g, DisList):
 	""" deals with distance stuff
@@ -50,13 +58,13 @@ def distanceCalcs(Fc, d, g, DisList):
 		#coordDist = DIST CALCULATIONS USING TUPLE d AND THE COORD TUPLE OF ELEMENT C IN THE DICT
 		diningHallCoord=DisList[c][1]
 		#calc distance
-		g[0] = math.radians(g[0])
-		g[1] = math.radians(g[1])
-		deltax = g[0]-diningHallCoord[0]
-		meanx = (g[0]+diningHallCoord[0])/2.0
-		deltay = g[1]-diningHallCoord[1]
+		x = math.radians(g[0])
+		y = math.radians(g[1])
+		deltax = x-diningHallCoord[0]
+		meanx = (x+diningHallCoord[0])/2.0
+		deltay = y-diningHallCoord[1]
 		coordDist=3958.761*math.sqrt((deltax**2)+(math.cos(meanx)*deltay)**2)
-		Distances.append([DisLIst[c][0], coordDist])
+		Distances.append([DisList[c][0], coordDist])
 
 	#remove any lists in the Fc that have a third element (dining Hall) that corresponds to 
 	#the current dining hall's coordinates only if that dining hall is too far away
@@ -69,7 +77,7 @@ def distanceCalcs(Fc, d, g, DisList):
 		for i in range(len(Fc)):
 			if Fc[i][2]==diningHallCoord:
 				Fc[i][2] = d
-	return [Fc, distances]
+	return [Fc, Distances]
 
 def scoreList(Fc, d, weightingFactorF):
 	"""creates a list that scores each food list, with matching indices to Fc
@@ -81,12 +89,15 @@ def scoreList(Fc, d, weightingFactorF):
 	#create a list with the "score" of each list within Fc, where the indices of the new list match the indices of Fc 
 	#determine the weighting factor for distance, since we are given the one for walking
 	weightingFactorD = 1 - weightingFactorF
-	scores = []
+	scores = [0]*len(Fc)
 	for n in range(len(Fc)):
 		#creates a score out of 10 for the distance of the nth element
 		if d == 0.0:
 			d = 1.0
-		distanceScore = (Fc[n][2]/d)*10
+		print Fc[n][1]
+		print Fc
+		#Fc[n][1]=math.sqrt(int((Fc[n][1][1]))**2 + int((Fc[n][1][2]))**2)
+		distanceScore = (Fc[n][1]/d)*10
 		#weight the distanceScore according to the user's preference
 		distanceScore = distanceScore*weightingFactorD
 		#weight the food's score, which is given in each food list's element 2
@@ -115,10 +126,10 @@ def numResults(Fc, d, weightingFactor, scores, n):
 		n = len(Fc)-1
 	results = []
 	for i in range(n):
-		top = resultstopResult(scores)
+		top = topResult(Fc, scores)
 		results.append(top)
 		Fc.remove(top)
-		scores = scoreList(Fc, d, weightingFactorF)
+		scores = scoreList(Fc, d, weightingFactor)
 	return results
 
 def changer(results, distances):
@@ -130,12 +141,44 @@ def changer(results, distances):
 	return results
 
 
-def main():
-	#Fc = 
-	#d = 
-	#g = 
-#	nomnomnom(Fc, d, 0.5, g)
+def taggedcuisine(meal):
+	tags = meal[2]
+	#if preferredTag in tags:
+	return True
+	#else:
+	#	return False
 
 
-#	if __name__ == "__main__":
-#		main()
+def tagFinder(keyName):
+	print keyName
+	print type(keyName)
+	food = dinner.find_one({"name": keyName})
+	if food:
+		tagList = food["tags"]
+		return tagList
+	else:
+		return None
+
+def makeChoice(g, foodListDict):
+	Fc = []
+	# list of lists with three elements, name, value, list of tags, dininghall name
+	favMeals = []
+	for key in foodListDict:
+		key = str(key)
+		tagList = tagFinder(key)
+		if tagList:
+			hallName = tagList[0]
+			favMeals.append([key, foodListDict[key], tagList, hallName])
+	preferredTag = ""
+	filter(taggedcuisine, favMeals)
+	if len(favMeals) == 0:
+		print "No options for you. Try to be more exciting!"
+	print favMeals
+	for f in range(len(favMeals)):
+		hallName = favMeals[f][3]
+		Fc.append([favMeals[f][0], favMeals[f][1], hallName])
+	d = 1000000
+	return nomnomnom(Fc, d, 0.5, g)
+
+
+
