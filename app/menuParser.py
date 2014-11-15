@@ -213,13 +213,7 @@ def muddDinner():
 
 
 def allMeals():
-    bigList = muddDinner + muddBreakfast + muddLunch + 
-                pitzerDinner + pitzerBreakfast + pitzerLunch
-                + frankDinner + frankBreakfast + frankLunch
-                + fraryDinner + fraryBreakfast + fraryLunch
-                + scrippsDinner + scrippsBreakfast + scrippsLunch
-                + oldenborgDinner + oldenborgBreakfast + oldenborgLunch
-                + cmcDinner + cmcBreakfast + cmcLunch
+    bigList = muddBreakfast() + muddLunch() + pitzerBreakfast() + pitzerLunch() + fraryBreakfast() + fraryLunch() + cmcBreakfast() + cmcLunch()
     return bigList
     
 if __name__ == "__main__":

@@ -6,7 +6,7 @@
 {% redirect(url_for('index')) %}
 {% else %}
 <form method="POST" action="{{ url_for('login')}}" role="form">
-	{{ form_field(login_form.teamname)}}
+	{{ form_field(login_form.username)}}
 	{{ form_field(login_form.password)}}
 	<button type = "submit">Login</button>
 </form>

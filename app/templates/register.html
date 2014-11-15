@@ -2,12 +2,12 @@
 
 {% block content %}
 <form method="post" action="{{ url_for('register') }}" role="form">
-	{{ form_field(form.teamname) }}
-	{{ form_field(form.names) }}
-	{{ form_field(form.languages) }}
-	{{ form_field(form.email) }}
+	{{ form_field(form.username) }}
 	{{ form_field(form.password) }}
 	{{ form_field(form.confirm) }}
+	{{ form_field(form.firstFoods) }}
+	{{ form_field(form.secondFoods) }}
+	{{ form_field(form.thirdFoods) }}
 	<button class = "btn btn-primary" type= "submit">Register</button>
 </form>
 {% endblock %}

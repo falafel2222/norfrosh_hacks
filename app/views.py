@@ -2,14 +2,25 @@ from flask import render_template, request, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import app, login_manager
 from forms import RegisterForm, LoginForm
-from flask.ext.login import current_user, login_user, logout_user
+from flask.ext.login import current_user, login_user, logout_user, login_required
 from models import User
+from pymongo import MongoClient
+
+client = MongoClient('mongodb://norfrosh:food@ds051110.mongolab.com:51110/users')
+db = client.users
+user = db.user
 
 @login_manager.user_loader
 def load_user(userid):
-	#r = firebase.get('/users/'+ userid + '.json')
-	r = {} # update to get user from mongodb
-	pass #User(userid, r['names'], r['languages'], r['email'], r['password']) 
+	u = user.find_one({"username": userid})
+	bestFoods = {}
+	for food in r['firstFoods']:
+		bestFoods[food]=10
+	for food in r['secondFoods']:
+		bestFoods[food] = 7
+	for food in r['thirdFoods']:
+		bestFoods[food] = 4
+	return User(userid, r['password'], bestFoods) 
 
 
 @app.route('/')
@@ -21,14 +32,19 @@ def index():
 def register():
 	form = RegisterForm()
 	if request.method == 'POST':
+		bestFoods = {}
+		for food in form.firstFoods.data:
+			bestFoods[food]=10
+		for food in form.secondFoods.data:
+			bestFoods[food] = 7
+		for food in form.thirdFoods.data:
+			bestFoods[food] = 4
 		user_data = {
-			'names': form.names.data,
-			'languages': form.languages.data,
-			'email': form.email.data,
-			'password': generate_password_hash(form.password.data)
+			'name': form.username.data,
+			'password': generate_password_hash(form.password.data),
+			'foodList': bestFoods
 		}
-		teamname = form.teamname.data
-		#firebase.put('/users/'+teamname+'.json',user_data)
+		user.insert(user_data)
 
 		return redirect(url_for('index'))
 
@@ -37,15 +53,21 @@ def register():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
 	form = LoginForm()
-	#user = firebase.get('/users/'+form.teamname.data + '.json')
-	user = None
-	print user
+	u = user.find_one({"username": form.username.data})
+	print u
 	print "trying to login"
-	if user: # and check_password_hash(user['password'], form.password.data):
+	if u: # and check_password_hash(user['password'], form.password.data):
 		print 'should be logging in now'
-		u = load_user(form.teamname.data)
-		login_user(u)
+		uu = load_user(form.teamname.data)
+		login_user(uu)
 	return redirect(url_for('index'))
+
+@app.route('/getloc',methods=['POST'])
+@login_required
+def getloc():
+
+	print request.form["lat"], request.form["lng"]
+	return request.form["lat"], request.form["lng"]
 
 @app.route('/logout', methods=["POST"])
 def logout():

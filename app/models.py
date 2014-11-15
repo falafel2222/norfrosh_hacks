@@ -1,12 +1,12 @@
 from flask.ext.login import UserMixin
 
 class User(UserMixin):		# stores all of our user data
-	def __init__(self, teamname, names, languages, email, password):
-		self.teamname = teamname
-		self.name = names
-		self.languages = languages
-		self.email = email
+	def __init__(self, username, password, bestFoods):
+		self.username = username
 		self.password = password
+		self.location=(0,0)
+		self.bestFoods = bestFoods
+
 	def get_id(self):
 		return unicode(self.teamname)	#flask login ids have to be unicode
 
@@ -52,17 +52,11 @@ class User(UserMixin):		# stores all of our user data
 	def get_college():
 		return self.college
 
-	def set_xlocation(x):
-		self.x = x
+	def set_location(loc):
+		self.loc = loc
 
-	def get_xlocation():
+	def get_location():
 		return self.x
-
-	def set_ylocation(y):
-		self.y = y
-
-	def get_ylocation():
-		return y
 
 	
 
